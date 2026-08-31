@@ -2,13 +2,19 @@ Panels:
   - Class: rviz_common/Displays
     Name: Displays
 Visualization Manager:
+  Enabled: true
   Global Options: {Fixed Frame: base_link, Background Color: "20; 20; 20"}
   Displays:
-    - {Class: rviz_default_plugins/Grid, Name: Grid, Cell Size: 10, Plane Cell Count: 8}
-    - {Class: rviz_default_plugins/PointCloud2, Name: LiDAR, Topic: {Value: /obf/lidar}, Size (Pixels): 2, Color Transformer: AxisColor, Axis: Z}
-    - {Class: rviz_default_plugins/MarkerArray, Name: Detections, Topic: {Value: /obf/markers}}
-    - {Class: rviz_default_plugins/Map, Name: Drivable, Topic: {Value: /obf/drivable}, Alpha: 0.5, Color Scheme: costmap}
-    - {Class: rviz_default_plugins/Map, Name: OccTopDown, Topic: {Value: /obf/occ_topdown}, Alpha: 0.4}
-    - {Class: rviz_default_plugins/Image, Name: CamFront, Topic: {Value: /obf/cam_front}}
+    - {Class: rviz_default_plugins/Grid, Name: Grid, Enabled: true, Cell Size: 10, Plane Cell Count: 8}
+    - {Class: rviz_default_plugins/PointCloud2, Name: LiDAR, Enabled: true, Topic: {Value: /obf/lidar}, Size (Pixels): 2, Color Transformer: AxisColor, Axis: Z}
+    - {Class: rviz_default_plugins/MarkerArray, Name: Detections, Enabled: true, Topic: {Value: /obf/markers}}
+    - {Class: rviz_default_plugins/Map, Name: Drivable, Enabled: true, Topic: {Value: /obf/drivable}, Alpha: 0.5, Color Scheme: costmap}
+    - {Class: rviz_default_plugins/Map, Name: OccTopDown, Enabled: true, Topic: {Value: /obf/occ_topdown}, Alpha: 0.4}
+    - {Class: rviz_default_plugins/Image, Name: CamFront, Enabled: true, Topic: {Value: /obf/cam_front}}
   Views:
     Current: {Class: rviz_default_plugins/Orbit, Distance: 90, Pitch: 1.2, Yaw: 3.14, Focal Point: {X: 0, Y: 0, Z: 0}}
+Window Geometry:
+  Width: 1280
+  Height: 800
+  X: 0
+  Y: 0

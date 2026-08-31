@@ -40,10 +40,10 @@ flowchart LR
 | Component | State |
 |---|---|
 | Code: data pipeline, model, training, eval, export, TRT, C++, ROS 2, VLA, DVC, CI | complete — CI runs unit tests, ONNX opset-17 export with ORT parity (4.8e-7), the full train→eval→dump→VLA-eval loop on synthetic data (`dataset=fake`), and a C++ syntax check |
-| nuScenes-mini training / ablation numbers | **pending GPU runs** (`scripts/kaggle_train.sh`) — no numbers are fabricated; `docs/REPORT.md` fills itself from `results/*.json` |
+| nuScenes-mini training / ablation numbers | done on a local NVIDIA L4 (12 ep each): cam 0.022/0.059 → cam+L 0.047/0.099 → cam+L+R 0.053/0.108 (mAP/NDS), seg mIoU 0.302, occ mIoU 0.086; radar-dropout and mined-finetune rows in `docs/REPORT.md` (rain/night subsets are empty on mini_val → “—”) |
 | TensorRT engines + latency table | built + measured on a local NVIDIA L4 (`results/latency_l4.md`; `scripts/colab_trt.sh` remains for T4 — relabel the output if used) |
 | GOOSE transfer | done (goose_2d/3d_val.zip, 8 scenes 6/2 split): zero-shot drivable IoU 0.021 → fine-tuned 0.348; LiDAR-only — the 2D/3D zips ship no calibration, `goose_calib.py` writes identity and the camera branch self-disables |
-| rviz2 GIF | pending ROS 2 machine (`scripts/make_rviz_gif.sh`) |
+| rviz2 GIF | done — `docs/rviz_replay.gif` recorded in the `ros:humble` container (Xvfb + ffmpeg; obf_node at 11.5 ms/frame on the L4 FP16 engine) |
 
 ## Quick start
 ```bash
