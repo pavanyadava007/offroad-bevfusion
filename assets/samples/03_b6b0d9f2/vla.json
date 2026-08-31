@@ -1,0 +1,193 @@
+{
+ "action": "approach_pile",
+ "target": "pile",
+ "reason": "path clear, heading to pile",
+ "raw": "{\"action\": \"approach_pile\", \"target\": \"pile\", \"reason\": \"path clear, heading to pile\"}",
+ "parsed": true,
+ "perception_source": "gt",
+ "lora": "checkpoints/vla_lora",
+ "split": "val",
+ "nearest_pedestrian_in_path_m": null,
+ "gt_pedestrians": [
+  {
+   "x": -5.5,
+   "y": -6.4,
+   "dist": 8.5,
+   "in_path": false
+  },
+  {
+   "x": -4.4,
+   "y": -8.3,
+   "dist": 9.4,
+   "in_path": false
+  },
+  {
+   "x": -6.1,
+   "y": -7.4,
+   "dist": 9.6,
+   "in_path": false
+  },
+  {
+   "x": -6.0,
+   "y": -8.0,
+   "dist": 10.0,
+   "in_path": false
+  },
+  {
+   "x": -8.0,
+   "y": -6.5,
+   "dist": 10.3,
+   "in_path": false
+  },
+  {
+   "x": -7.3,
+   "y": -7.4,
+   "dist": 10.4,
+   "in_path": false
+  },
+  {
+   "x": -10.7,
+   "y": -6.7,
+   "dist": 12.7,
+   "in_path": false
+  },
+  {
+   "x": -12.6,
+   "y": 8.3,
+   "dist": 15.1,
+   "in_path": false
+  },
+  {
+   "x": -12.9,
+   "y": 12.1,
+   "dist": 17.7,
+   "in_path": false
+  },
+  {
+   "x": -12.9,
+   "y": 13.0,
+   "dist": 18.3,
+   "in_path": false
+  },
+  {
+   "x": 16.0,
+   "y": 12.1,
+   "dist": 20.1,
+   "in_path": false
+  },
+  {
+   "x": -19.1,
+   "y": -6.8,
+   "dist": 20.3,
+   "in_path": false
+  },
+  {
+   "x": 16.1,
+   "y": 12.7,
+   "dist": 20.5,
+   "in_path": false
+  },
+  {
+   "x": -11.2,
+   "y": 17.6,
+   "dist": 20.9,
+   "in_path": false
+  },
+  {
+   "x": -3.8,
+   "y": 21.3,
+   "dist": 21.6,
+   "in_path": false
+  },
+  {
+   "x": -9.0,
+   "y": 19.8,
+   "dist": 21.8,
+   "in_path": false
+  },
+  {
+   "x": 20.1,
+   "y": -9.1,
+   "dist": 22.0,
+   "in_path": false
+  },
+  {
+   "x": -9.7,
+   "y": 19.9,
+   "dist": 22.1,
+   "in_path": false
+  },
+  {
+   "x": -9.3,
+   "y": 20.4,
+   "dist": 22.4,
+   "in_path": false
+  },
+  {
+   "x": -11.6,
+   "y": 19.2,
+   "dist": 22.4,
+   "in_path": false
+  },
+  {
+   "x": -16.7,
+   "y": 15.3,
+   "dist": 22.7,
+   "in_path": false
+  },
+  {
+   "x": -3.8,
+   "y": -26.4,
+   "dist": 26.7,
+   "in_path": false
+  },
+  {
+   "x": -20.0,
+   "y": 19.6,
+   "dist": 28.0,
+   "in_path": false
+  },
+  {
+   "x": -6.1,
+   "y": 30.5,
+   "dist": 31.1,
+   "in_path": false
+  },
+  {
+   "x": -30.7,
+   "y": -6.6,
+   "dist": 31.4,
+   "in_path": false
+  },
+  {
+   "x": 31.6,
+   "y": -8.6,
+   "dist": 32.8,
+   "in_path": false
+  },
+  {
+   "x": -31.3,
+   "y": 10.1,
+   "dist": 32.9,
+   "in_path": false
+  },
+  {
+   "x": -34.6,
+   "y": -8.1,
+   "dist": 35.6,
+   "in_path": false
+  },
+  {
+   "x": -36.3,
+   "y": 8.8,
+   "dist": 37.3,
+   "in_path": false
+  },
+  {
+   "x": 38.3,
+   "y": -9.3,
+   "dist": 39.4,
+   "in_path": false
+  }
+ ]
+}

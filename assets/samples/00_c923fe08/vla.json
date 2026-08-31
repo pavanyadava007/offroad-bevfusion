@@ -7,5 +7,175 @@
  "perception_source": "gt",
  "lora": "checkpoints/vla_lora",
  "split": "train",
- "nearest_pedestrian_in_path_m": 2.4
+ "nearest_pedestrian_in_path_m": 2.4,
+ "gt_pedestrians": [
+  {
+   "x": 0.4,
+   "y": 2.4,
+   "dist": 2.4,
+   "in_path": true
+  },
+  {
+   "x": -3.3,
+   "y": 4.3,
+   "dist": 5.4,
+   "in_path": false
+  },
+  {
+   "x": 12.2,
+   "y": -25.7,
+   "dist": 28.5,
+   "in_path": false
+  },
+  {
+   "x": -27.3,
+   "y": -8.1,
+   "dist": 28.5,
+   "in_path": false
+  },
+  {
+   "x": -29.7,
+   "y": -0.1,
+   "dist": 29.7,
+   "in_path": false
+  },
+  {
+   "x": 21.4,
+   "y": -21.1,
+   "dist": 30.0,
+   "in_path": false
+  },
+  {
+   "x": -30.0,
+   "y": 2.0,
+   "dist": 30.1,
+   "in_path": false
+  },
+  {
+   "x": 21.3,
+   "y": -21.8,
+   "dist": 30.5,
+   "in_path": false
+  },
+  {
+   "x": -31.4,
+   "y": -0.5,
+   "dist": 31.4,
+   "in_path": false
+  },
+  {
+   "x": 22.7,
+   "y": -21.7,
+   "dist": 31.4,
+   "in_path": false
+  },
+  {
+   "x": 23.4,
+   "y": -21.3,
+   "dist": 31.7,
+   "in_path": false
+  },
+  {
+   "x": -32.1,
+   "y": -0.4,
+   "dist": 32.1,
+   "in_path": false
+  },
+  {
+   "x": 23.0,
+   "y": -22.7,
+   "dist": 32.3,
+   "in_path": false
+  },
+  {
+   "x": 27.3,
+   "y": -21.9,
+   "dist": 35.1,
+   "in_path": false
+  },
+  {
+   "x": 27.1,
+   "y": -22.6,
+   "dist": 35.3,
+   "in_path": false
+  },
+  {
+   "x": 33.0,
+   "y": -24.0,
+   "dist": 40.8,
+   "in_path": false
+  },
+  {
+   "x": 42.1,
+   "y": 10.9,
+   "dist": 43.4,
+   "in_path": false
+  },
+  {
+   "x": 43.8,
+   "y": -2.6,
+   "dist": 43.9,
+   "in_path": false
+  },
+  {
+   "x": -30.3,
+   "y": -32.9,
+   "dist": 44.7,
+   "in_path": false
+  },
+  {
+   "x": 42.4,
+   "y": -19.7,
+   "dist": 46.7,
+   "in_path": false
+  },
+  {
+   "x": -33.9,
+   "y": -33.9,
+   "dist": 47.9,
+   "in_path": false
+  },
+  {
+   "x": 48.0,
+   "y": -1.1,
+   "dist": 48.0,
+   "in_path": false
+  },
+  {
+   "x": 49.1,
+   "y": 0.6,
+   "dist": 49.1,
+   "in_path": false
+  },
+  {
+   "x": 49.1,
+   "y": -0.2,
+   "dist": 49.1,
+   "in_path": false
+  },
+  {
+   "x": 45.1,
+   "y": -22.3,
+   "dist": 50.3,
+   "in_path": false
+  },
+  {
+   "x": 35.0,
+   "y": -37.9,
+   "dist": 51.6,
+   "in_path": false
+  },
+  {
+   "x": 52.1,
+   "y": 0.4,
+   "dist": 52.1,
+   "in_path": false
+  },
+  {
+   "x": 70.6,
+   "y": -19.1,
+   "dist": 73.1,
+   "in_path": false
+  }
+ ]
 }

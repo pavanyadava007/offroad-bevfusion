@@ -91,7 +91,7 @@ def _ego(draw, S):
     draw.polygon([(cx, cy - 10), (cx - 6, cy + 8), (cx + 6, cy + 8)], fill=(0xFF, 0xFF, 0xFF))
 
 
-def render_bev(o, dets, S=640):
+def render_bev(o, dets, gt_peds=None, S=640):
     canvas = np.zeros((200, 200, 3), np.float32) + np.array(SURF, np.float32)
     if "seg" in o:
         seg = 1 / (1 + np.exp(-o["seg"][0]))  # [3,Y,X] drivable/vehicle/pedestrian
@@ -111,6 +111,15 @@ def render_bev(o, dets, S=640):
             ex, ey = d["x"] + dx * c - dy * s, d["y"] + dx * s + dy * c
             pts.append((S / 2 - ey * scale, S / 2 - ex * scale))
         draw.polygon(pts, outline=tuple(col), width=2)
+    for p in (gt_peds or []):
+        cx, cy = S / 2 - p["y"] * (S / 80.0), S / 2 - p["x"] * (S / 80.0)
+        draw.ellipse([cx - 4, cy - 4, cx + 4, cy + 4], outline=(255, 255, 255), width=2)
+    hz = [p for p in (gt_peds or []) if p["in_path"] and p["dist"] < 10]
+    if hz:
+        p = min(hz, key=lambda q: q["dist"])
+        cx, cy = S / 2 - p["y"] * (S / 80.0), S / 2 - p["x"] * (S / 80.0)
+        draw.ellipse([cx - 16, cy - 16, cx + 16, cy + 16], outline=(0xE6, 0x67, 0x67), width=3)
+        draw.text((cx + 20, cy - 8), f"in path · {p['dist']} m", fill=(0xE6, 0x67, 0x67))
     _ego(draw, S)
     return img
 
@@ -138,7 +147,8 @@ def render_occ(o, S=640):
 def frame_label(d):
     v = json.load(open(os.path.join(d, "vla.json"))) if os.path.exists(os.path.join(d, "vla.json")) else {}
     ped = v.get("nearest_pedestrian_in_path_m")
-    tag = f"pedestrian in path {ped} m" if ped is not None else "clear scene"
+    n = len(v.get("gt_pedestrians", []))
+    tag = f"ped IN PATH {ped} m" if ped is not None else f"{n} peds, none in corridor"
     return f"{os.path.basename(d)[:2]} · {tag} · {v.get('action', '?').upper()}"
 
 
@@ -149,7 +159,8 @@ def render(label):
     d = LABELS[label]
     o, dt = run(d)
     dets = decode_dets(o)
-    bev = render_bev(o, dets)
+    vla_pre = json.load(open(os.path.join(d, "vla.json"))) if os.path.exists(os.path.join(d, "vla.json")) else {}
+    bev = render_bev(o, dets, vla_pre.get("gt_pedestrians"))
     occ = render_occ(o)
     cam = os.path.join(d, "cam_front.jpg")
     rows = [[CLASSES[x["cls"]], round(x["score"], 2), round(float(np.hypot(x["x"], x["y"])), 1),
@@ -203,26 +214,33 @@ with gr.Blocks(title="offroad-bevfusion") as demo:
         <span class="chip">TensorRT FP16 on L4: 15.3 ms</span><span class="chip"><a href="https://github.com/pavanyadava007/offroad-bevfusion" style="color:#3987e5;text-decoration:none">GitHub repo &nearr;</a></span>
       </div>
     </div>""")
-    sel = gr.Radio(list(LABELS), value=list(LABELS)[0], label="nuScenes-mini frame (cached)")
-    tiles = gr.HTML()
-    with gr.Row():
-        with gr.Column(scale=5):
-            cam = gr.Image(label="CAM_FRONT", height=300)
-            vla = gr.HTML()
-        with gr.Column(scale=4):
-            bev = gr.Image(label="BEV — segmentation + detections (forward ↑)", height=430)
-            gr.HTML("""<div class="legend">
-              <span class="chip"><span class="dot" style="background:#3987e5"></span>drivable</span>
-              <span class="chip"><span class="dot" style="background:#199e70"></span>vehicle</span>
-              <span class="chip"><span class="dot" style="background:#d95926"></span>pedestrian</span>
-              <span class="chip"><span class="dot" style="background:#8a8980"></span>other det</span>
-              <span class="chip">△ ego</span></div>""")
-        with gr.Column(scale=4):
-            occ = gr.Image(label="3D occupancy — top surface height (forward ↑)", height=430)
-            gr.HTML('<div class="legend"><span class="chip"><span class="dot" style="background:#173a63"></span>low&nbsp;&rarr;&nbsp;<span class="dot" style="background:#8fc2ff"></span>high occupied</span></div>')
-    dets = gr.Dataframe(headers=["class", "conf", "dist m", "bearing °", "x m", "y m"], label="detections (score > 0.35, top 12)",
-                        interactive=False)
-    raw = gr.JSON(label="raw VLA JSON", open=False)
+    with gr.Tab("Frame explorer"):
+        sel = gr.Radio(list(LABELS), value=list(LABELS)[0], label="nuScenes-mini frame (cached)")
+        tiles = gr.HTML()
+        with gr.Row():
+            with gr.Column(scale=5):
+                cam = gr.Image(label="CAM_FRONT — GT pedestrian boxes (red = in corridor < 10 m, green = elsewhere)", height=300)
+                vla = gr.HTML()
+            with gr.Column(scale=4):
+                bev = gr.Image(label="BEV — segmentation + detections (forward ↑)", height=430)
+                gr.HTML("""<div class="legend">
+                  <span class="chip"><span class="dot" style="background:#3987e5"></span>drivable</span>
+                  <span class="chip"><span class="dot" style="background:#199e70"></span>vehicle</span>
+                  <span class="chip"><span class="dot" style="background:#d95926"></span>pedestrian</span>
+                  <span class="chip"><span class="dot" style="background:#8a8980"></span>other det</span>
+                  <span class="chip">○ GT pedestrian</span>
+                  <span class="chip">△ ego</span></div>""")
+            with gr.Column(scale=4):
+                occ = gr.Image(label="3D occupancy — top surface height (forward ↑)", height=430)
+                gr.HTML('<div class="legend"><span class="chip"><span class="dot" style="background:#173a63"></span>low&nbsp;&rarr;&nbsp;<span class="dot" style="background:#8fc2ff"></span>high occupied</span></div>')
+        dets = gr.Dataframe(headers=["class", "conf", "dist m", "bearing °", "x m", "y m"], label="detections (score > 0.35, top 12)",
+                            interactive=False)
+        raw = gr.JSON(label="raw VLA JSON", open=False)
+    with gr.Tab("Sequence replay (81 val frames)"):
+        gr.HTML('<div class="sub" style="color:#a8a79e;font-size:.9rem;margin:6px 0">The full nuScenes-mini validation split replayed '
+                'through the model (TensorRT-equivalent PyTorch forward): front camera + BEV segmentation/detections, forward-up. '
+                'Pre-rendered offline; the ROS 2 node runs the same stream live at 11.5 ms/frame on an L4 (see docs/rviz_replay.gif in the repo).</div>')
+        gr.Image(value=os.path.join(ROOT, "replay.gif"), label="validation sequence replay", height=420)
     gr.HTML('<div class="sub" style="color:#8a8980;font-size:.8rem;margin-top:6px">Measured CPU inference ~0.85 s/frame mean '
             '(0.81–0.96 s, 32-core x86; HF free-tier CPUs will be slower). Tensors regenerable via scripts/make_demo_assets.py. '
             'VLA JSONs are cached offline outputs of Qwen2.5-VL-3B + LoRA with GT perception.</div>')
