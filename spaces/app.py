@@ -60,7 +60,7 @@ def render(frame_dir):
 
 with gr.Blocks(title="offroad-bevfusion") as demo:
     gr.Markdown("## offroad-bevfusion — cam+LiDAR+radar BEV perception (ONNX Runtime, CPU) + VLA action")
-    gr.Markdown("_Measured CPU inference: ~0.85 s/frame mean (0.81–0.96 s over the 5 cached frames, ONNX Runtime CPU EP, 32-core x86; HF free-tier CPUs will be slower). VLA JSONs are cached offline outputs of Qwen2.5-VL-3B + LoRA with GT perception._")
+    gr.Markdown("_Measured CPU inference: ~0.85 s/frame mean (0.81–0.96 s over the 5 cached frames, ONNX Runtime CPU EP, 32-core x86; HF free-tier CPUs will be slower). The .npy input/output tensors are not in the GitHub repo — full samples ship with the HF Space repo, or regenerate them with scripts/make_demo_assets.py (raw dumps: dvc pull data/samples). VLA JSONs are cached offline outputs of Qwen2.5-VL-3B + LoRA with GT perception._")
     sel = gr.Dropdown(FRAMES, value=FRAMES[0] if FRAMES else None, label="cached nuScenes-mini frame")
     with gr.Row():
         cam = gr.Image(label="CAM_FRONT"); seg = gr.Image(label="BEV seg (G drivable, R vehicle, B pedestrian)"); occ = gr.Image(label="occupancy top view")
