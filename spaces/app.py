@@ -160,8 +160,8 @@ def render(label):
     o, dt = run(d)
     dets = decode_dets(o)
     vla_pre = json.load(open(os.path.join(d, "vla.json"))) if os.path.exists(os.path.join(d, "vla.json")) else {}
-    bev = render_bev(o, dets, vla_pre.get("gt_pedestrians"))
-    occ = render_occ(o)
+    bev = render_bev(o, dets, vla_pre.get("gt_pedestrians"), S=960)
+    occ = render_occ(o, S=960)
     cam = os.path.join(d, "cam_front.jpg")
     rows = [[CLASSES[x["cls"]], round(x["score"], 2), round(float(np.hypot(x["x"], x["y"])), 1),
              round(float(np.degrees(np.arctan2(x["y"], x["x"]))), 0), round(x["x"], 1), round(x["y"], 1)] for x in dets]
@@ -182,7 +182,37 @@ def render(label):
       <div class="tile"><div class="v">{driv*100:.0f}%</div><div class="k">BEV drivable coverage</div></div>
       <div class="tile"><div class="v">{(f"{ped} m" if ped is not None else "—")}</div><div class="k">nearest pedestrian in path</div></div>
     </div>"""
-    return cam, bev, occ, rows, tiles, vla_html, vla
+    gtp = vla_pre.get("gt_pedestrians", [])
+    covered = 0
+    if "seg" in o and gtp:
+        pm = 1 / (1 + np.exp(-o["seg"][0][2])) > 0.5
+        for p_ in gtp:
+            ix, iy = int((p_["x"] + 40) / 0.4), int((p_["y"] + 40) / 0.4)
+            if 1 <= ix < 199 and 1 <= iy < 199 and pm[iy - 1:iy + 2, ix - 1:ix + 2].any():
+                covered += 1
+    from collections import Counter
+    hist = Counter(CLASSES[x["cls"]] for x in dets).most_common(3)
+    in_path = [p_ for p_ in gtp if p_["in_path"]]
+    npd = vla.get("nearest_pedestrian_in_path_m")
+    if npd is not None and npd < 5:
+        why = f"a pedestrian is inside the corridor at {npd} m &lt; 5 m &rarr; the hard rule forces <b>STOP</b>"
+    elif npd is not None and npd < 10:
+        why = f"a pedestrian is inside the corridor at {npd} m (5&ndash;10 m band) &rarr; <b>WAIT</b>"
+    else:
+        why = "no pedestrian inside the corridor &rarr; the task action proceeds"
+    analysis = f"""
+    <div class="card vla"><div class="cap">Analysis — how to read this frame</div><ul class="an">
+      <li><b>Scene (ground truth):</b> {len(gtp)} annotated pedestrians; {len(in_path)} inside the driving corridor
+          (0&nbsp;&lt;&nbsp;x&nbsp;&lt;&nbsp;20 m, |y|&nbsp;&lt;&nbsp;2.5 m); nearest in-path: {npd if npd is not None else "&mdash;"} m.</li>
+      <li><b>Model vs GT:</b> predicted pedestrian segmentation covers <b>{covered}/{len(gtp)}</b> GT pedestrians
+          (white circles on the BEV; the red ring marks the decision-critical one).</li>
+      <li><b>Detections:</b> {len(dets)} above 0.35 &mdash; {", ".join(f"{n}&times; {c}" for c, n in hist) or "none"}.
+          Drivable coverage {driv*100:.0f}% of the 80&times;80 m grid.</li>
+      <li><b>Decision:</b> {why}. The VLM's answer and the deterministic rule agree on
+          <b>{vla.get("action", "?").upper()}</b>.</li>
+      <li><b>Tip:</b> use the &#x26F6; button on any panel for full-screen; images render at 960&times;960 so you can zoom.</li>
+    </ul></div>"""
+    return cam, bev, occ, rows, tiles, vla_html + analysis, vla
 
 
 CSS = """
@@ -201,6 +231,9 @@ CSS = """
 .card.vla .cap {font-size: .78rem; color: #a8a79e; margin-bottom: 8px;}
 .card.vla .badge {display: inline-block; font-weight: 700; letter-spacing: .04em; border-radius: 8px; padding: 6px 14px; font-size: 1.05rem;}
 .card.vla .reason {margin-top: 8px; color: #c3c2b7; font-size: .9rem;}
+.card.vla {margin-top: 10px;}
+ul.an {margin: 4px 0 0 16px; padding: 0; color: #c3c2b7; font-size: .87rem; line-height: 1.55;}
+ul.an li {margin-bottom: 4px;}
 footer {display: none !important;}
 """
 
@@ -240,7 +273,7 @@ with gr.Blocks(title="offroad-bevfusion") as demo:
         gr.HTML('<div class="sub" style="color:#a8a79e;font-size:.9rem;margin:6px 0">The full nuScenes-mini validation split replayed '
                 'through the model (TensorRT-equivalent PyTorch forward): front camera + BEV segmentation/detections, forward-up. '
                 'Pre-rendered offline; the ROS 2 node runs the same stream live at 11.5 ms/frame on an L4 (see docs/rviz_replay.gif in the repo).</div>')
-        gr.Image(value=os.path.join(ROOT, "replay.gif"), label="validation sequence replay", height=420)
+        gr.Video(value=os.path.join(ROOT, "replay.mp4"), label="validation sequence replay (13.5 s, 81 frames @ 6 fps)", height=500, autoplay=True, loop=True)
     gr.HTML('<div class="sub" style="color:#8a8980;font-size:.8rem;margin-top:6px">Measured CPU inference ~0.85 s/frame mean '
             '(0.81–0.96 s, 32-core x86; HF free-tier CPUs will be slower). Tensors regenerable via scripts/make_demo_assets.py. '
             'VLA JSONs are cached offline outputs of Qwen2.5-VL-3B + LoRA with GT perception.</div>')
