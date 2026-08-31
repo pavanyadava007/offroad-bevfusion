@@ -232,8 +232,11 @@ CSS = """
 .card.vla .badge {display: inline-block; font-weight: 700; letter-spacing: .04em; border-radius: 8px; padding: 6px 14px; font-size: 1.05rem;}
 .card.vla .reason {margin-top: 8px; color: #c3c2b7; font-size: .9rem;}
 .card.vla {margin-top: 10px;}
-ul.an {margin: 4px 0 0 16px; padding: 0; color: #c3c2b7; font-size: .87rem; line-height: 1.55;}
-ul.an li {margin-bottom: 4px;}
+ul.an {margin: 4px 0 0 16px; padding: 0; font-size: .95rem; line-height: 1.6;}
+ul.an, ul.an li, .card.vla .cap, .card.vla .reason {color: #e8e7df !important;}
+ul.an li {margin-bottom: 6px;}
+ul.an b, .card.vla .reason b {color: #ffffff !important;}
+.card.vla .cap {color: #b9b8ae !important;}
 footer {display: none !important;}
 """
 
