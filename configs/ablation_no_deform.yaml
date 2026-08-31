@@ -1,0 +1,4 @@
+_base_: base.yaml
+name: no_deform
+model: {bev_encoder: {layers: 0}}
+train: {ckpt_dir: checkpoints/no_deform}

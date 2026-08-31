@@ -1,0 +1,76 @@
+{
+  "split": "train",
+  "per_scene": {
+    "cc8c0bf57f984915a77078b10eb33198": {
+      "name": "scene-0061",
+      "desc": "Parked truck, construction, intersection, turn left, following a van",
+      "mAP": 0.21620175085623136,
+      "NDS": 0.21408168841441128,
+      "n": 39
+    },
+    "6f83169d067343658251f72e1dd17dbc": {
+      "name": "scene-0553",
+      "desc": "Wait at intersection, bicycle, large truck, peds crossing crosswalk, ped with stroller",
+      "mAP": 0.4181049693921709,
+      "NDS": 0.3823439431035959,
+      "n": 41
+    },
+    "bebf5f5b2a674631ab5c88fd1aa9e87a": {
+      "name": "scene-0655",
+      "desc": "Parking lot, parked cars, jaywalker, bendy bus, gardening vehicles",
+      "mAP": 0.12963104238513337,
+      "NDS": 0.16359200847519997,
+      "n": 41
+    },
+    "2fc3753772e241f2ab2cd16a784cc680": {
+      "name": "scene-0757",
+      "desc": "Arrive at busy intersection, bus, wait at intersection, bicycle, peds",
+      "mAP": 0.2896821963035282,
+      "NDS": 0.2676592695086855,
+      "n": 41
+    },
+    "c5224b9b454b4ded9b5d2d2634bbda8a": {
+      "name": "scene-0796",
+      "desc": "Scooter, peds on sidewalk, bus, cars, truck, fake construction worker, bicycle, cross intersection, car overtaking us",
+      "mAP": 0.09834786121484336,
+      "NDS": 0.09812899452124327,
+      "n": 40
+    },
+    "d25718445d89453381c659b9c8734939": {
+      "name": "scene-1077",
+      "desc": "Night, big street, bus stop, high speed, construction vehicle",
+      "mAP": 0.11725504967124607,
+      "NDS": 0.09989085371016343,
+      "n": 41
+    },
+    "de7d80a1f5fb4c3e82ce8a4f213b450a": {
+      "name": "scene-1094",
+      "desc": "Night, after rain, many peds, PMD, ped with bag, jaywalker, truck, scooter",
+      "mAP": 0.11314821612615192,
+      "NDS": 0.10590937482612124,
+      "n": 40
+    },
+    "e233467e827140efa4b42d2b4c435855": {
+      "name": "scene-1100",
+      "desc": "Night, peds in sidewalk, peds cross crosswalk, scooter, PMD, difficult lighting",
+      "mAP": 0.25414258921370825,
+      "NDS": 0.206610432642303,
+      "n": 40
+    }
+  },
+  "hardest": [
+    "c5224b9b454b4ded9b5d2d2634bbda8a",
+    "de7d80a1f5fb4c3e82ce8a4f213b450a",
+    "d25718445d89453381c659b9c8734939"
+  ],
+  "scene_weights": {
+    "c5224b9b454b4ded9b5d2d2634bbda8a": 3.0,
+    "de7d80a1f5fb4c3e82ce8a4f213b450a": 3.0,
+    "d25718445d89453381c659b9c8734939": 3.0,
+    "bebf5f5b2a674631ab5c88fd1aa9e87a": 1.0,
+    "cc8c0bf57f984915a77078b10eb33198": 1.0,
+    "e233467e827140efa4b42d2b4c435855": 1.0,
+    "2fc3753772e241f2ab2cd16a784cc680": 1.0,
+    "6f83169d067343658251f72e1dd17dbc": 1.0
+  }
+}

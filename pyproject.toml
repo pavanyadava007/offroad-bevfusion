@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "offroad-bevfusion"
+version = "0.1.0"
+description = "Camera+LiDAR+radar BEV multitask perception with TensorRT/ROS 2 deployment, off-road transfer and VLM task grounding"
+requires-python = ">=3.10"
+dependencies = [
+  "torch>=2.1", "torchvision>=0.16", "numpy<2", "pyyaml", "tqdm", "scipy", "shapely",
+  "opencv-python-headless", "pyquaternion", "nuscenes-devkit>=1.1.11",
+]
+[project.optional-dependencies]
+export = ["onnx>=1.15", "onnxruntime-gpu", "onnxsim", "tensorrt>=10,<11"]  # TRT 11 removed the INT8 calibrator API
+vla = ["transformers>=4.49,<6", "qwen-vl-utils", "accelerate", "peft", "bitsandbytes"]  # verified with 5.16
+dev = ["pytest", "ruff", "wandb", "dvc[gdrive]", "gradio", "onnx", "onnxruntime"]
+mm = ["mmdet3d>=1.4", "mmcv>=2.0", "mmengine"]
+
+[tool.setuptools.packages.find]
+include = ["obf*"]
+
+[tool.ruff]
+line-length = 120
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = ["E731", "E741", "E501", "E702", "B905", "B008"]  # compact style; long lines accepted
+[tool.ruff.lint.isort]
+known-first-party = ["obf"]

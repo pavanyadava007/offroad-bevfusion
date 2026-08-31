@@ -1,0 +1,21 @@
+# CPU-runnable config for tests / CI / export smoke checks (same code path, tiny shapes).
+_base_: base.yaml
+name: tiny
+data:
+  img_size: [64, 128]
+  cams: [CAM_FRONT, CAM_BACK]
+  batch_size: 1
+  workers: 0
+grid:
+  pc_range: [-6.4, -6.4, -1.0, 6.4, 6.4, 5.4]
+  bev_size: [32, 32]
+  occ_z: 16
+model:
+  cam: {backbone: resnet18, pretrained: false, d_bound: [1.0, 9.0, 1.0], out_ch: 16}
+  lidar: {pillar: 0.2, max_pillars: 200, max_points: 8, in_ch: 5, feat_ch: 16, out_ch: 32}
+  radar: {pillar: 0.8, max_pillars: 32, max_points: 4, in_ch: 7, feat_ch: 8, out_ch: 8, dropout: 0.2}
+  fuser: {out_ch: 32}
+  bev_encoder: {layers: 1, heads: 4, points: 2, ffn: 64}
+heads:
+  det: {head_ch: 16}
+train: {epochs: 1, amp: false, ckpt_dir: checkpoints/tiny}

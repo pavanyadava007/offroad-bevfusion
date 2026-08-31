@@ -1,0 +1,20 @@
+{
+  "seg_IoU": {
+    "drivable": 0.2411156499009295,
+    "low_veg": 0.41108586423244375,
+    "high_veg": 0.4990699474630551,
+    "obstacle": 0.010635433494884222,
+    "person": 0.0,
+    "vehicle": 0.0007978856031516481,
+    "water": 0.0,
+    "terrain_other": 0.9960707269155207
+  },
+  "seg_mIoU": 0.26984693845124813,
+  "name": "goose_transfer_ep7",
+  "radar_drop": 0.0,
+  "modalities": [
+    "cam",
+    "lidar"
+  ],
+  "n_samples": 154
+}

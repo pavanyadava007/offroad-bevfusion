@@ -1,0 +1,15 @@
+onnx: results/export/bevfusion.onnx
+opset: 17
+engines:
+  fp16: results/export/bevfusion_fp16.engine
+  int8: results/export/bevfusion_int8.engine
+calib:
+  dir: data/samples/calib        # 100 preprocessed frames (obf.export.dump_samples --n 100)
+  n_frames: 100
+  cache: results/export/int8_calib.cache
+  algorithm: entropy2            # IInt8EntropyCalibrator2
+workspace_gb: 4
+bench:
+  iters: 200
+  warmup: 30
+  out: results/latency_l4.md

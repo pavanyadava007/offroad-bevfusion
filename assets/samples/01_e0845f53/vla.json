@@ -1,0 +1,11 @@
+{
+ "action": "stop",
+ "target": null,
+ "reason": "pedestrian in path within 5 m",
+ "raw": "{\"action\": \"stop\", \"target\": null, \"reason\": \"pedestrian in path within 5 m\"}",
+ "parsed": true,
+ "perception_source": "gt",
+ "lora": "checkpoints/vla_lora",
+ "split": "train",
+ "nearest_pedestrian_in_path_m": 4.9
+}

@@ -1,0 +1,75 @@
+stages:
+  infos:
+    cmd: python scripts/create_infos.py --root data/nuscenes --version v1.0-mini --out data/infos --occ_root data/occ3d/gts
+    deps: [scripts/create_infos.py, data/nuscenes/v1.0-mini]
+    outs: [data/infos]
+  splits:
+    cmd: python -m obf.data.splits data/infos/nuscenes_v1.0-mini_infos.pkl data/splits
+    deps: [data/infos/nuscenes_v1.0-mini_infos.pkl, obf/data/splits.py]
+    outs: [data/splits/val_rain.json, data/splits/val_night.json, data/splits/val_clear_day.json, data/splits/val_all.json]
+  train_cam:
+    cmd: python -m obf.train --cfg configs/ablation_cam.yaml
+    deps: [data/infos, obf/models, obf/data, obf/train.py, configs/ablation_cam.yaml, configs/base.yaml]
+    params: [train]
+    outs: [checkpoints/cam/best.pt]
+  train_cam_lidar:
+    cmd: python -m obf.train --cfg configs/ablation_cam_lidar.yaml
+    deps: [data/infos, obf/models, obf/data, obf/train.py, configs/ablation_cam_lidar.yaml, configs/base.yaml]
+    outs: [checkpoints/cam_lidar/best.pt]
+  train_cam_lidar_radar:
+    cmd: python -m obf.train --cfg configs/ablation_cam_lidar_radar.yaml
+    deps: [data/infos, obf/models, obf/data, obf/train.py, configs/base.yaml]
+    outs: [checkpoints/cam_lidar_radar/best.pt]
+  eval_ablations:
+    cmd: >
+      python -m obf.eval --cfg configs/ablation_cam.yaml --ckpt checkpoints/cam/best.pt --name cam &&
+      python -m obf.eval --cfg configs/ablation_cam_lidar.yaml --ckpt checkpoints/cam_lidar/best.pt --name cam_lidar &&
+      python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar
+    deps: [checkpoints/cam/best.pt, checkpoints/cam_lidar/best.pt, checkpoints/cam_lidar_radar/best.pt, obf/eval.py]
+    metrics: [results/cam.json, results/cam_lidar.json, results/cam_lidar_radar.json]
+  eval_robustness:
+    cmd: >
+      python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_rdrop50 --radar_drop 0.5 &&
+      python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_rdrop100 --radar_drop 1.0 &&
+      python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_rain --subset rain &&
+      python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_night --subset night &&
+      python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_clear_day --subset clear_day
+    deps: [checkpoints/cam_lidar_radar/best.pt, data/splits/val_rain.json, data/splits/val_night.json]
+    metrics: [results/cam_lidar_radar_rdrop50.json, results/cam_lidar_radar_rdrop100.json, results/cam_lidar_radar_rain.json, results/cam_lidar_radar_night.json]
+  eval_train:   # train-split detections for hard-example mining (val stays untouched)
+    cmd: python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_train --split train
+    deps: [checkpoints/cam_lidar_radar/best.pt, obf/eval.py]
+    metrics: [results/cam_lidar_radar_train.json]
+    outs: [results/eval/cam_lidar_radar_train/detections.json]
+  mine:
+    cmd: python -m obf.mining.hard_examples --cfg configs/base.yaml --det results/eval/cam_lidar_radar_train/detections.json --k 3
+    deps: [results/eval/cam_lidar_radar_train/detections.json, obf/mining/hard_examples.py]
+    outs: [data/splits/hard_scenes.json]
+  dump_samples:
+    cmd: >
+      python -m obf.export.dump_samples --cfg configs/base.yaml --n 100 --out data/samples/calib &&
+      python -m obf.export.dump_samples --cfg configs/base.yaml --n 81 --out data/samples/replay --raw
+    deps: [data/infos, obf/export/dump_samples.py]
+    outs: [data/samples/calib, data/samples/replay]
+  export_onnx:
+    cmd: python -m obf.export.onnx_export --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --out results/export/bevfusion.onnx
+    deps: [checkpoints/cam_lidar_radar/best.pt, obf/export/onnx_export.py]
+    outs: [results/export/bevfusion.onnx]
+  build_trt:   # run on Colab T4 (scripts/colab_trt.sh); engines are GPU-specific -> frozen, tracked as outputs
+    frozen: true
+    cmd: bash scripts/colab_trt.sh
+    deps: [results/export/bevfusion.onnx, data/samples/calib]
+    outs: [results/export/bevfusion_fp16.engine, results/export/bevfusion_int8.engine, results/latency_l4.md]
+  vla_safety:
+    cmd: python -m obf.vla.safety_eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --perception model --split train  # mini_val has zero hazard frames
+    deps: [checkpoints/cam_lidar_radar/best.pt, obf/vla]
+    metrics: [results/vla_safety.json]
+  goose:
+    frozen: true
+    cmd: bash scripts/goose_transfer.sh
+    deps: [checkpoints/cam_lidar/best.pt, data/goose]
+    metrics: [results/goose_transfer.json, results/goose_zero_shot.json, results/goose_drop.json]
+  report:
+    cmd: python -m obf.report
+    deps: [results, obf/report.py]
+    outs: [docs/REPORT.md]

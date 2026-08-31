@@ -1,0 +1,49 @@
+seed: 0
+name: cam_lidar_radar
+data:
+  root: data/nuscenes
+  version: v1.0-mini
+  infos: data/infos
+  occ_root: data/occ3d/gts
+  img_size: [256, 704]          # (H, W); feature stride 16 -> 16x44
+  cams: [CAM_FRONT, CAM_FRONT_RIGHT, CAM_FRONT_LEFT, CAM_BACK, CAM_BACK_LEFT, CAM_BACK_RIGHT]
+  lidar_sweeps: 1
+  radar_sweeps: 5
+  workers: 4
+  batch_size: 2
+  hard_scene_weights: null      # data/splits/hard_scenes.json (from obf.mining.hard_examples)
+grid:                           # single 0.4 m grid shared by det / seg / occ (== Occ3D-nuScenes voxel grid)
+  pc_range: [-40.0, -40.0, -1.0, 40.0, 40.0, 5.4]
+  bev_size: [200, 200]          # (Y, X)
+  occ_z: 16
+model:
+  modalities: [cam, lidar, radar]
+  cam: {backbone: resnet18, pretrained: true, d_bound: [1.0, 45.0, 1.0], out_ch: 80}
+  lidar: {pillar: 0.2, max_pillars: 20000, max_points: 20, in_ch: 5, feat_ch: 64, out_ch: 128, use_mmdet3d: false}
+  radar: {pillar: 0.8, max_pillars: 1500, max_points: 12, in_ch: 7, feat_ch: 32, out_ch: 32, dropout: 0.2}
+  fuser: {out_ch: 128}
+  bev_encoder: {layers: 2, heads: 8, points: 4, ffn: 256}
+heads:
+  det:
+    classes: [car, truck, construction_vehicle, bus, trailer, barrier, motorcycle, bicycle, pedestrian, traffic_cone]
+    head_ch: 64
+    score_thr: 0.1
+    max_dets: 500
+  seg:
+    classes: [drivable_area, vehicle, pedestrian]
+  occ:
+    classes: 18                 # Occ3D-nuScenes: 17 semantic + free (17)
+    use_camera_mask: true
+loss:
+  uncertainty_weighting: true   # Kendall et al. 2018 homoscedastic weighting; else fixed weights below
+  fixed_weights: {det: 1.0, seg: 1.0, occ: 1.0}
+train:
+  epochs: 12
+  lr: 2.0e-4
+  wd: 0.01
+  warmup_iters: 200
+  grad_clip: 35.0
+  amp: true
+  ckpt_dir: checkpoints/cam_lidar_radar
+  eval_every: 1
+  wandb_project: offroad-bevfusion

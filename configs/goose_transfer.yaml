@@ -1,0 +1,23 @@
+_base_: base.yaml
+name: goose_transfer
+dataset: goose
+data:
+  root: data/goose
+  cams: [CAM_FRONT]           # GOOSE: single windshield camera, no radar
+  img_size: [256, 704]
+  batch_size: 4
+  lidar_sweeps: 1
+model:
+  modalities: [cam, lidar]
+  cam: {pretrained: false}
+heads:
+  det: null
+  occ: null
+  seg:
+    classes: [drivable, low_veg, high_veg, obstacle, person, vehicle, water, terrain_other]
+    multilabel: false           # GOOSE BEV seg is single-label -> CE
+train:
+  epochs: 8
+  lr: 1.0e-4
+  init_from: checkpoints/cam_lidar/best.pt   # nuScenes-pretrained backbone (heads re-initialised)
+  ckpt_dir: checkpoints/goose_transfer

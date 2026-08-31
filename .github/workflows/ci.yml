@@ -1,0 +1,29 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.10"}
+      - run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -e .[dev]
+      - run: ruff check obf tests scripts --config pyproject.toml
+      - run: pytest -q tests
+      - name: ONNX export smoke (tiny config, opset 17, ORT parity check)
+        run: python -m obf.export.onnx_export --cfg configs/tiny.yaml --out /tmp/tiny.onnx
+      - name: train -> eval -> export -> VLA safety loop on synthetic data (CPU)
+        run: |
+          python -m obf.train --cfg configs/tiny.yaml --opts dataset=fake data.fake_n=4 train.epochs=1 train.ckpt_dir=/tmp/ck
+          python -m obf.eval --cfg configs/tiny.yaml --ckpt /tmp/ck/best.pt --name ci_tiny --opts dataset=fake data.fake_n=4
+          python -m obf.export.dump_samples --cfg configs/tiny.yaml --n 2 --out /tmp/dump --raw --opts dataset=fake data.fake_n=4
+          python -m obf.vla.safety_eval --cfg configs/tiny.yaml --dry_run --n 4 --out /tmp/vla.json --opts dataset=fake data.fake_n=4
+          python -m obf.report
+  cpp-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y g++
+      - name: syntax-check C++ (no TensorRT/CUDA on the runner -> header stubs in cpp/ci_stubs)
+        run: g++ -std=c++17 -Wall -fsyntax-only -I cpp/include -I cpp/ci_stubs cpp/src/trt_runner.cpp cpp/src/main.cpp

@@ -1,0 +1,10 @@
+{
+  "name": "goose_zero_shot",
+  "n_samples": 154,
+  "seg_IoU": {
+    "drivable": 0.021327132557195917,
+    "obstacle": 0.6585146180360809
+  },
+  "seg_mIoU": 0.3399208752966384,
+  "note": "zero-shot: nuScenes 3-ch head, drivable channel thresholded"
+}

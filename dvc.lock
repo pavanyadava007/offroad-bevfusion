@@ -1,0 +1,341 @@
+schema: '2.0'
+stages:
+  infos:
+    cmd: python scripts/create_infos.py --root data/nuscenes --version v1.0-mini
+      --out data/infos --occ_root data/occ3d/gts
+    deps:
+    - path: data/nuscenes/v1.0-mini
+      hash: md5
+      md5: bdd3b6b06af33f7264a503ea646ae609.dir
+      size: 33291476
+      nfiles: 13
+    - path: scripts/create_infos.py
+      hash: md5
+      md5: 1e74e21c9fae9a2282e6b2eaf939290f
+      size: 7241
+    outs:
+    - path: data/infos
+      hash: md5
+      md5: 653c71840ef7e01a875c3c4f17474dad.dir
+      size: 29009822
+      nfiles: 809
+  splits:
+    cmd: python -m obf.data.splits data/infos/nuscenes_v1.0-mini_infos.pkl 
+      data/splits
+    deps:
+    - path: data/infos/nuscenes_v1.0-mini_infos.pkl
+      hash: md5
+      md5: 2400c47bb01bdbfd64654b22a4156caa
+      size: 1826566
+    - path: obf/data/splits.py
+      hash: md5
+      md5: cec2a67c1ba54a28ca84409e327a350c
+      size: 1054
+    outs:
+    - path: data/splits/val_all.json
+      hash: md5
+      md5: 448f9b4cd861125657a97a321b33fe91
+      size: 2916
+    - path: data/splits/val_clear_day.json
+      hash: md5
+      md5: 448f9b4cd861125657a97a321b33fe91
+      size: 2916
+    - path: data/splits/val_night.json
+      hash: md5
+      md5: d751713988987e9331980363e24189ce
+      size: 2
+    - path: data/splits/val_rain.json
+      hash: md5
+      md5: d751713988987e9331980363e24189ce
+      size: 2
+  train_cam:
+    cmd: python -m obf.train --cfg configs/ablation_cam.yaml
+    deps:
+    - path: configs/ablation_cam.yaml
+      hash: md5
+      md5: e0a964d46c31beebbd9c1f1296138326
+      size: 90
+    - path: configs/base.yaml
+      hash: md5
+      md5: 92b2947699889a246a92206dc1c1e678
+      size: 1782
+    - path: data/infos
+      hash: md5
+      md5: 653c71840ef7e01a875c3c4f17474dad.dir
+      size: 29009822
+      nfiles: 809
+    - path: obf/data
+      hash: md5
+      md5: e7ba6e81ece12cb35eb7e6b44688c8e4.dir
+      size: 38357
+      nfiles: 15
+    - path: obf/models
+      hash: md5
+      md5: 652c1101534fa0f31ee42b86e6818745.dir
+      size: 53739
+      nfiles: 26
+    - path: obf/train.py
+      hash: md5
+      md5: dc9334170622c4ea49b30bf90a3cc735
+      size: 4755
+    params:
+      params.yaml:
+        train:
+          epochs: 12
+          lr: 0.0002
+          batch_size: 2
+    outs:
+    - path: checkpoints/cam/best.pt
+      hash: md5
+      md5: d547bd2ed696af922d5e9fdc12e42f42
+      size: 247019507
+  train_cam_lidar:
+    cmd: python -m obf.train --cfg configs/ablation_cam_lidar.yaml
+    deps:
+    - path: configs/ablation_cam_lidar.yaml
+      hash: md5
+      md5: 3812d907966109bb556d093177da9340
+      size: 109
+    - path: configs/base.yaml
+      hash: md5
+      md5: 92b2947699889a246a92206dc1c1e678
+      size: 1782
+    - path: data/infos
+      hash: md5
+      md5: 653c71840ef7e01a875c3c4f17474dad.dir
+      size: 29009822
+      nfiles: 809
+    - path: obf/data
+      hash: md5
+      md5: e7ba6e81ece12cb35eb7e6b44688c8e4.dir
+      size: 38357
+      nfiles: 15
+    - path: obf/models
+      hash: md5
+      md5: 652c1101534fa0f31ee42b86e6818745.dir
+      size: 53739
+      nfiles: 26
+    - path: obf/train.py
+      hash: md5
+      md5: dc9334170622c4ea49b30bf90a3cc735
+      size: 4755
+    outs:
+    - path: checkpoints/cam_lidar/best.pt
+      hash: md5
+      md5: c234fc2aeb392ec51ed37fd7fa9529eb
+      size: 257918010
+  train_cam_lidar_radar:
+    cmd: python -m obf.train --cfg configs/ablation_cam_lidar_radar.yaml
+    deps:
+    - path: configs/base.yaml
+      hash: md5
+      md5: 92b2947699889a246a92206dc1c1e678
+      size: 1782
+    - path: data/infos
+      hash: md5
+      md5: 653c71840ef7e01a875c3c4f17474dad.dir
+      size: 29009822
+      nfiles: 809
+    - path: obf/data
+      hash: md5
+      md5: e7ba6e81ece12cb35eb7e6b44688c8e4.dir
+      size: 38357
+      nfiles: 15
+    - path: obf/models
+      hash: md5
+      md5: 652c1101534fa0f31ee42b86e6818745.dir
+      size: 53739
+      nfiles: 26
+    - path: obf/train.py
+      hash: md5
+      md5: dc9334170622c4ea49b30bf90a3cc735
+      size: 4755
+    outs:
+    - path: checkpoints/cam_lidar_radar/best.pt
+      hash: md5
+      md5: d3ae63a1a86e5d905799079a3247d955
+      size: 258600793
+  eval_ablations:
+    cmd: "python -m obf.eval --cfg configs/ablation_cam.yaml --ckpt checkpoints/cam/best.pt
+      --name cam && python -m obf.eval --cfg configs/ablation_cam_lidar.yaml --ckpt
+      checkpoints/cam_lidar/best.pt --name cam_lidar && python -m obf.eval --cfg configs/base.yaml
+      --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar\n"
+    deps:
+    - path: checkpoints/cam/best.pt
+      hash: md5
+      md5: d547bd2ed696af922d5e9fdc12e42f42
+      size: 247019507
+    - path: checkpoints/cam_lidar/best.pt
+      hash: md5
+      md5: c234fc2aeb392ec51ed37fd7fa9529eb
+      size: 257918010
+    - path: checkpoints/cam_lidar_radar/best.pt
+      hash: md5
+      md5: d3ae63a1a86e5d905799079a3247d955
+      size: 258600793
+    - path: obf/eval.py
+      hash: md5
+      md5: 993c2e639b264786183400aa200db239
+      size: 8356
+    outs:
+    - path: results/cam.json
+      hash: md5
+      md5: 90929ba4354d62f1c663c1adfbb6dda9
+      size: 1153
+    - path: results/cam_lidar.json
+      hash: md5
+      md5: 8e7ab825f061e913db8f22e2dff01a43
+      size: 1209
+    - path: results/cam_lidar_radar.json
+      hash: md5
+      md5: 4e04aabe38c0500397541b43a6872849
+      size: 1204
+  eval_train:
+    cmd: python -m obf.eval --cfg configs/base.yaml --ckpt 
+      checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_train --split 
+      train
+    deps:
+    - path: checkpoints/cam_lidar_radar/best.pt
+      hash: md5
+      md5: d3ae63a1a86e5d905799079a3247d955
+      size: 258600793
+    - path: obf/eval.py
+      hash: md5
+      md5: 993c2e639b264786183400aa200db239
+      size: 8356
+    outs:
+    - path: results/cam_lidar_radar_train.json
+      hash: md5
+      md5: 1d264354ffd00af79bf2c8d10f1c75a6
+      size: 1316
+    - path: results/eval/cam_lidar_radar_train/detections.json
+      hash: md5
+      md5: b51ed060fe8c41b477f282459d3d84b1
+      size: 29238642
+  mine:
+    cmd: python -m obf.mining.hard_examples --cfg configs/base.yaml --det 
+      results/eval/cam_lidar_radar_train/detections.json --k 3
+    deps:
+    - path: obf/mining/hard_examples.py
+      hash: md5
+      md5: bf838b1976188743151ef330d7336a07
+      size: 2688
+    - path: results/eval/cam_lidar_radar_train/detections.json
+      hash: md5
+      md5: b51ed060fe8c41b477f282459d3d84b1
+      size: 29238642
+    outs:
+    - path: data/splits/hard_scenes.json
+      hash: md5
+      md5: 4bc85ecea539ba3bed09f5a70b9b38cc
+      size: 2597
+  dump_samples:
+    cmd: "python -m obf.export.dump_samples --cfg configs/base.yaml --n 100 --out
+      data/samples/calib && python -m obf.export.dump_samples --cfg configs/base.yaml
+      --n 81 --out data/samples/replay --raw\n"
+    deps:
+    - path: data/infos
+      hash: md5
+      md5: 653c71840ef7e01a875c3c4f17474dad.dir
+      size: 29009822
+      nfiles: 809
+    - path: obf/export/dump_samples.py
+      hash: md5
+      md5: 5eb63b8b89565c26b5cd1765db401778
+      size: 2787
+    outs:
+    - path: data/samples/calib
+      hash: md5
+      md5: 14aa2818b31cfca36890a00dc5a2c192.dir
+      size: 2422927365
+      nfiles: 901
+    - path: data/samples/replay
+      hash: md5
+      md5: 69078201bbad165d922194b938e6c82e.dir
+      size: 3924909591
+      nfiles: 1459
+  export_onnx:
+    cmd: python -m obf.export.onnx_export --cfg configs/base.yaml --ckpt 
+      checkpoints/cam_lidar_radar/best.pt --out results/export/bevfusion.onnx
+    deps:
+    - path: checkpoints/cam_lidar_radar/best.pt
+      hash: md5
+      md5: d3ae63a1a86e5d905799079a3247d955
+      size: 258600793
+    - path: obf/export/onnx_export.py
+      hash: md5
+      md5: fd81b034f94279cad5b7ac2bf971f310
+      size: 3315
+    outs:
+    - path: results/export/bevfusion.onnx
+      hash: md5
+      md5: 803e47a5697f0099d84e0446c2350ff6
+      size: 141523062
+  build_trt:
+    cmd: bash scripts/colab_trt.sh
+    deps:
+    - path: data/samples/calib
+      hash: md5
+      md5: 14aa2818b31cfca36890a00dc5a2c192.dir
+      size: 2422927365
+      nfiles: 901
+    - path: results/export/bevfusion.onnx
+      hash: md5
+      md5: 803e47a5697f0099d84e0446c2350ff6
+      size: 141523062
+    outs:
+    - path: results/export/bevfusion_fp16.engine
+      hash: md5
+      md5: ace9d357fc45fe03b472064a6109018a
+      size: 83135868
+    - path: results/export/bevfusion_int8.engine
+      hash: md5
+      md5: 4914e0f1d0f5a19c9323b4a48fd3db6e
+      size: 69280028
+    - path: results/latency_l4.md
+      hash: md5
+      md5: ee1c52982164372daa4da4707c86e791
+      size: 500
+  vla_safety:
+    cmd: python -m obf.vla.safety_eval --cfg configs/base.yaml --ckpt 
+      checkpoints/cam_lidar_radar/best.pt --perception model --split train
+    deps:
+    - path: checkpoints/cam_lidar_radar/best.pt
+      hash: md5
+      md5: d3ae63a1a86e5d905799079a3247d955
+      size: 258600793
+    - path: obf/vla
+      hash: md5
+      md5: fe0f5b8af1caf4123a97c8278827cf9e.dir
+      size: 35474
+      nfiles: 12
+    outs:
+    - path: results/vla_safety.json
+      hash: md5
+      md5: aef531fed63e8b79155ccd4df8094115
+      size: 21060
+  goose:
+    cmd: bash scripts/goose_transfer.sh
+    deps:
+    - path: checkpoints/cam_lidar/best.pt
+      hash: md5
+      md5: c234fc2aeb392ec51ed37fd7fa9529eb
+      size: 257918010
+    - path: data/goose
+      hash: md5
+      md5: fa27622fdcd144d4d46b01002f56da5d.dir
+      size: 12709338861
+      nfiles: 6745
+    outs:
+    - path: results/goose_drop.json
+      hash: md5
+      md5: ede909b94a4247aa0760eaa54ee61fac
+      size: 131
+    - path: results/goose_transfer.json
+      hash: md5
+      md5: b88eff3b4d99657ab41dd728d012fbea
+      size: 431
+    - path: results/goose_zero_shot.json
+      hash: md5
+      md5: c53ba958982063ec7c904537216a7193
+      size: 251

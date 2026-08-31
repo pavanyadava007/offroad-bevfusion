@@ -1,0 +1,75 @@
+{
+  "note": "INT8 PTQ remediation history (accuracy_check vs PyTorch fp32, 20 calib frames). Thresholds: occ/seg agreement >= 0.97, hm_max_abs_err <= 0.05.",
+  "attempts": [
+    {
+      "calib": "entropy2",
+      "fp16_pinned": "none",
+      "hm_max_abs_err": 0.209,
+      "seg_agreement": 0.981,
+      "occ_agreement": 0.9008
+    },
+    {
+      "calib": "minmax",
+      "fp16_pinned": "none",
+      "hm_max_abs_err": 0.1272,
+      "seg_agreement": 0.9696,
+      "occ_agreement": 0.881
+    },
+    {
+      "calib": "minmax",
+      "fp16_pinned": "heads (16 layers)",
+      "hm_max_abs_err": 0.1281,
+      "seg_agreement": 0.9696,
+      "occ_agreement": 0.8817
+    },
+    {
+      "calib": "minmax",
+      "fp16_pinned": "heads+bev_enc+pfns+lss (189)",
+      "hm_max_abs_err": 0.1284,
+      "seg_agreement": 0.9696,
+      "occ_agreement": 0.8817
+    },
+    {
+      "calib": "minmax",
+      "fp16_pinned": "heads+bev_enc+pfns+lss+fuser (195)",
+      "hm_max_abs_err": 0.0697,
+      "seg_agreement": 0.9776,
+      "occ_agreement": 0.8944
+    },
+    {
+      "calib": "entropy2",
+      "fp16_pinned": "heads+bev_enc+pfns+lss+fuser (195)",
+      "hm_max_abs_err": 0.2106,
+      "seg_agreement": 0.9807,
+      "occ_agreement": 0.9028
+    }
+  ],
+  "final": "minmax + fp16-pinned heads/bev_enc/pfns/lss/fuser on the mask-multiply graph. Agreement thresholds unmet; end-task deltas <= 0.004 (see stage4b).",
+  "stage4b": {
+    "change": "pillars.py masked_fill(-1e4) -> mask multiplication (bit-identical, unit-tested); ONNX re-exported (ORT parity 4.77e-05), fp16+int8 engines rebuilt with fresh calibration",
+    "attempts_on_fixed_graph": [
+      {
+        "calib": "entropy2",
+        "fp16_pinned": "none",
+        "hm_max_abs_err": 0.209,
+        "seg_agreement": 0.981,
+        "occ_agreement": 0.9008
+      },
+      {
+        "calib": "minmax",
+        "fp16_pinned": "none",
+        "hm_max_abs_err": 0.1284,
+        "seg_agreement": 0.9696,
+        "occ_agreement": 0.8809
+      },
+      {
+        "calib": "minmax",
+        "fp16_pinned": "heads+bev_enc+pfns+lss+fuser (195)",
+        "hm_max_abs_err": 0.0698,
+        "seg_agreement": 0.9776,
+        "occ_agreement": 0.8944
+      }
+    ],
+    "conclusion": "-1e4 sentinel was NOT the INT8 bottleneck (numbers identical to old graph); shipping engine stays minmax+pins; end-task deltas vs torch: mAP +0.0002, NDS -0.0010, seg -0.0031, occ -0.0039"
+  }
+}

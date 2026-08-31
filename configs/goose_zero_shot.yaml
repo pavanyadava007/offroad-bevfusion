@@ -1,0 +1,7 @@
+# nuScenes-trained cam+LiDAR model evaluated on GOOSE without fine-tuning: GOOSE labels collapsed to {drivable, not drivable}
+_base_: goose_transfer.yaml
+name: goose_zero_shot
+heads:
+  seg:
+    classes: [drivable, obstacle]     # GOOSE merge: everything non-drivable -> obstacle
+    multilabel: false

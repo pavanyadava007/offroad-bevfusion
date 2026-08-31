@@ -1,0 +1,4 @@
+_base_: base.yaml
+name: fixed_weights
+loss: {uncertainty_weighting: false}
+train: {ckpt_dir: checkpoints/fixed_weights}
