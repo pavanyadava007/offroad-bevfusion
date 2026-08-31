@@ -278,7 +278,11 @@ with gr.Blocks(title="offroad-bevfusion") as demo:
                 'Qwen2.5-VL-3B + LoRA fed with the model&rsquo;s own detections (bottom-left, with its reason). The closing segment '
                 'holds the two real &lt;5 m pedestrian-hazard frames (GT perception) where the decision flips to <b>STOP</b>. '
                 'Pre-rendered offline; the ROS 2 node runs the same perception stream live at 11.5 ms/frame on an L4.</div>')
-        gr.Video(value=os.path.join(ROOT, "replay.mp4"), label="end-to-end replay — perception + VLA (18.5 s, 111 frames @ 6 fps)", height=500, autoplay=True, loop=True)
+        gr.Video(value=os.path.join(ROOT, "replay.mp4"), label="1 · validation replay — perception + VLA, ends with the two <5 m STOP hazards (18.5 s)", height=480, autoplay=True, loop=True)
+        with gr.Row():
+            gr.Video(value=os.path.join(ROOT, "replay_hazard.mp4"), label="2 · hazard-scene drive (scene-0061) — watch the badge escalate to WAIT as workers near the corridor (10 s)", height=300, loop=True)
+            gr.Video(value=os.path.join(ROOT, "replay_night.mp4"), label="3 · night + wet, crowded street (scene-1094) — perception under low light (10 s)", height=300, loop=True)
+        gr.Video(value=os.path.join(ROOT, "replay_goose.mp4"), label="4 · GOOSE off-road transfer — fine-tuned 8-class BEV segmentation on the held-out rain scene (18 s)", height=480, loop=True)
     gr.HTML('<div class="sub" style="color:#8a8980;font-size:.8rem;margin-top:6px">Measured CPU inference ~0.85 s/frame mean '
             '(0.81–0.96 s, 32-core x86; HF free-tier CPUs will be slower). Tensors regenerable via scripts/make_demo_assets.py. '
             'VLA JSONs are cached offline outputs of Qwen2.5-VL-3B + LoRA with GT perception.</div>')
