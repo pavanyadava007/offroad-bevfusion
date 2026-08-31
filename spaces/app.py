@@ -6,7 +6,9 @@ import os
 import numpy as np
 import gradio as gr
 
-ROOT = os.path.join(os.path.dirname(__file__), "..", "assets")
+_here = os.path.dirname(os.path.abspath(__file__))
+ROOT = next((p for p in (os.path.join(_here, "assets"), os.path.join(_here, "..", "assets")) if os.path.isdir(p)),
+            os.path.join(_here, "assets"))  # HF Space root layout first, then repo layout (spaces/../assets)
 ONNX = os.path.join(ROOT, "bevfusion.onnx")
 FRAMES = sorted(glob.glob(os.path.join(ROOT, "samples", "*")))
 PC = (-40, -40, -1, 40, 40, 5.4)
