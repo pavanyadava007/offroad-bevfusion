@@ -270,10 +270,12 @@ with gr.Blocks(title="offroad-bevfusion") as demo:
                             interactive=False)
         raw = gr.JSON(label="raw VLA JSON", open=False)
     with gr.Tab("Sequence replay (81 val frames)"):
-        gr.HTML('<div class="sub" style="color:#a8a79e;font-size:.9rem;margin:6px 0">The full nuScenes-mini validation split replayed '
-                'through the model (TensorRT-equivalent PyTorch forward): front camera + BEV segmentation/detections, forward-up. '
-                'Pre-rendered offline; the ROS 2 node runs the same stream live at 11.5 ms/frame on an L4 (see docs/rviz_replay.gif in the repo).</div>')
-        gr.Video(value=os.path.join(ROOT, "replay.mp4"), label="validation sequence replay (13.5 s, 81 frames @ 6 fps)", height=500, autoplay=True, loop=True)
+        gr.HTML('<div class="sub" style="color:#a8a79e;font-size:.9rem;margin:6px 0">End-to-end stream: the full nuScenes-mini '
+                'validation split through perception <b>and</b> the VLA layer — each frame shows the live action badge from '
+                'Qwen2.5-VL-3B + LoRA fed with the model&rsquo;s own detections (bottom-left, with its reason). The closing segment '
+                'holds the two real &lt;5 m pedestrian-hazard frames (GT perception) where the decision flips to <b>STOP</b>. '
+                'Pre-rendered offline; the ROS 2 node runs the same perception stream live at 11.5 ms/frame on an L4.</div>')
+        gr.Video(value=os.path.join(ROOT, "replay.mp4"), label="end-to-end replay — perception + VLA (18.5 s, 111 frames @ 6 fps)", height=500, autoplay=True, loop=True)
     gr.HTML('<div class="sub" style="color:#8a8980;font-size:.8rem;margin-top:6px">Measured CPU inference ~0.85 s/frame mean '
             '(0.81–0.96 s, 32-core x86; HF free-tier CPUs will be slower). Tensors regenerable via scripts/make_demo_assets.py. '
             'VLA JSONs are cached offline outputs of Qwen2.5-VL-3B + LoRA with GT perception.</div>')
