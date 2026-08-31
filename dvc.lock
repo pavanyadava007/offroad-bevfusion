@@ -348,9 +348,9 @@ stages:
       size: 2583
     - path: results
       hash: md5
-      md5: e362439f8eb0eb76a7ffbae174621bb1.dir
-      size: 541294875
-      nfiles: 124
+      md5: 0df54fdc6467d730c29e53d00e4cc6b4.dir
+      size: 323410467
+      nfiles: 99
     outs:
     - path: docs/REPORT.md
       hash: md5
