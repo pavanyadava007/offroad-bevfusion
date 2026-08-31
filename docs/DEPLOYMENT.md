@@ -44,6 +44,15 @@ Measured C++ runner (obf_runner, FP16 engine, local NVIDIA L4, 200 iters after 2
   FP16 is the pragmatic deployment choice, INT8 is available with the documented caveat. Full history:
   results/int8_remediation.json.
 
+## DVC remote restore (backup: private HF dataset)
+The DVC cache (checkpoints, engines, dumped samples — 8.4 GB) is backed up to the private dataset repo
+`pavanyadava07/offroad-bevfusion-dvc` (a byte-for-byte copy of the local `files/md5` remote). To restore on a new machine:
+```bash
+pip install "huggingface_hub>=0.26" && export HF_TOKEN=<read token>
+python -c "from huggingface_hub import snapshot_download as s; s('pavanyadava07/offroad-bevfusion-dvc', repo_type='dataset', local_dir='/path/dvc-remote-obf')"
+dvc remote add --local restored /path/dvc-remote-obf && dvc pull -r restored --allow-missing
+```
+
 ## ROS 2 Humble
 `obf_node` (C++): TRT inference at 10 Hz, CenterPoint decode on host, publishes `/obf/detections` (vision_msgs/Detection3DArray),
 `/obf/markers`, `/obf/drivable` and `/obf/occ_topdown` (nav_msgs/OccupancyGrid). `replay_sensors.py` publishes PointCloud2 + CAM_FRONT.

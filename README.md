@@ -1,6 +1,6 @@
 # offroad-bevfusion
 
-[![ci](https://github.com/pavanyadava007/offroad-bevfusion/actions/workflows/ci.yml/badge.svg)](https://github.com/pavanyadava007/offroad-bevfusion/actions)
+[![ci](https://github.com/pavanyadava007/offroad-bevfusion/actions/workflows/ci.yml/badge.svg)](https://github.com/pavanyadava007/offroad-bevfusion/actions) [![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20demo-HF%20Space-blue)](https://huggingface.co/spaces/pavanyadava07/offroad-bevfusion)
 
 Camera + LiDAR + radar BEV multitask perception (3D detection · BEV segmentation · 3D occupancy) with a deformable-attention
 BEV encoder and uncertainty-weighted multitask loss, TensorRT FP16/INT8 + ROS 2 Humble deployment, off-road (GOOSE) transfer,

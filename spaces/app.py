@@ -215,6 +215,13 @@ def render(label):
     return cam, bev, occ, rows, tiles, vla_html + analysis, vla
 
 
+try:  # ZeroGPU Spaces require a @spaces.GPU-detected function; inference itself is CPU ONNX Runtime.
+    import spaces  # NB: locally this may resolve to the repo's own spaces/ dir -> no GPU attr -> no-op
+    render = getattr(spaces, "GPU", lambda f: f)(render)
+except ImportError:
+    pass
+
+
 CSS = """
 .gradio-container {max-width: 1280px !important; margin: 0 auto;}
 #hdr h1 {font-size: 1.45rem; margin: 0 0 2px;}
@@ -287,8 +294,8 @@ with gr.Blocks(title="offroad-bevfusion") as demo:
             '(0.81–0.96 s, 32-core x86; HF free-tier CPUs will be slower). Tensors regenerable via scripts/make_demo_assets.py. '
             'VLA JSONs are cached offline outputs of Qwen2.5-VL-3B + LoRA with GT perception.</div>')
     outs = [cam, bev, occ, dets, tiles, vla, raw]
-    sel.change(render, sel, outs)
+    sel.change(render, sel, outs, api_name="render")
     demo.load(render, sel, outs)
 
 if __name__ == "__main__":
-    demo.launch(css=CSS, theme=gr.themes.Base(primary_hue="blue", neutral_hue="stone"))
+    demo.launch(css=CSS, theme=gr.themes.Base(primary_hue="blue", neutral_hue="stone"), ssr_mode=False)
