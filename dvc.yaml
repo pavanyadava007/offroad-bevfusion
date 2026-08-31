@@ -26,7 +26,13 @@ stages:
       python -m obf.eval --cfg configs/ablation_cam_lidar.yaml --ckpt checkpoints/cam_lidar/best.pt --name cam_lidar &&
       python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar
     deps: [checkpoints/cam/best.pt, checkpoints/cam_lidar/best.pt, checkpoints/cam_lidar_radar/best.pt, obf/eval.py]
-    metrics: [results/cam.json, results/cam_lidar.json, results/cam_lidar_radar.json]
+    metrics:
+      - results/cam.json:
+          cache: false
+      - results/cam_lidar.json:
+          cache: false
+      - results/cam_lidar_radar.json:
+          cache: false
   eval_robustness:
     cmd: >
       python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_rdrop50 --radar_drop 0.5 &&
@@ -35,11 +41,21 @@ stages:
       python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_night --subset night &&
       python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_clear_day --subset clear_day
     deps: [checkpoints/cam_lidar_radar/best.pt, data/splits/val_rain.json, data/splits/val_night.json]
-    metrics: [results/cam_lidar_radar_rdrop50.json, results/cam_lidar_radar_rdrop100.json, results/cam_lidar_radar_rain.json, results/cam_lidar_radar_night.json]
+    metrics:
+      - results/cam_lidar_radar_rdrop50.json:
+          cache: false
+      - results/cam_lidar_radar_rdrop100.json:
+          cache: false
+      - results/cam_lidar_radar_rain.json:
+          cache: false
+      - results/cam_lidar_radar_night.json:
+          cache: false
   eval_train:   # train-split detections for hard-example mining (val stays untouched)
     cmd: python -m obf.eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --name cam_lidar_radar_train --split train
     deps: [checkpoints/cam_lidar_radar/best.pt, obf/eval.py]
-    metrics: [results/cam_lidar_radar_train.json]
+    metrics:
+      - results/cam_lidar_radar_train.json:
+          cache: false
     outs: [results/eval/cam_lidar_radar_train/detections.json]
   mine:
     cmd: python -m obf.mining.hard_examples --cfg configs/base.yaml --det results/eval/cam_lidar_radar_train/detections.json --k 3
@@ -63,13 +79,23 @@ stages:
   vla_safety:
     cmd: python -m obf.vla.safety_eval --cfg configs/base.yaml --ckpt checkpoints/cam_lidar_radar/best.pt --perception model --split train  # mini_val has zero hazard frames
     deps: [checkpoints/cam_lidar_radar/best.pt, obf/vla]
-    metrics: [results/vla_safety.json]
+    metrics:
+      - results/vla_safety.json:
+          cache: false
   goose:
     frozen: true
     cmd: bash scripts/goose_transfer.sh
     deps: [checkpoints/cam_lidar/best.pt, data/goose]
-    metrics: [results/goose_transfer.json, results/goose_zero_shot.json, results/goose_drop.json]
+    metrics:
+      - results/goose_transfer.json:
+          cache: false
+      - results/goose_zero_shot.json:
+          cache: false
+      - results/goose_drop.json:
+          cache: false
   report:
     cmd: python -m obf.report
     deps: [results, obf/report.py]
-    outs: [docs/REPORT.md]
+    outs:
+      - docs/REPORT.md:
+          cache: false

@@ -167,7 +167,7 @@ stages:
       size: 247019507
     - path: checkpoints/cam_lidar/best.pt
       hash: md5
-      md5: c234fc2aeb392ec51ed37fd7fa9529eb
+      md5: 9114d024a85e54fa293a019938260400
       size: 257918010
     - path: checkpoints/cam_lidar_radar/best.pt
       hash: md5
@@ -306,8 +306,8 @@ stages:
       size: 258600793
     - path: obf/vla
       hash: md5
-      md5: fe0f5b8af1caf4123a97c8278827cf9e.dir
-      size: 35474
+      md5: 3fe1251a9d90d9bd6a8842814b6ccae4.dir
+      size: 39374
       nfiles: 12
     outs:
     - path: results/vla_safety.json
@@ -319,7 +319,7 @@ stages:
     deps:
     - path: checkpoints/cam_lidar/best.pt
       hash: md5
-      md5: c234fc2aeb392ec51ed37fd7fa9529eb
+      md5: 9114d024a85e54fa293a019938260400
       size: 257918010
     - path: data/goose
       hash: md5
@@ -339,3 +339,20 @@ stages:
       hash: md5
       md5: c53ba958982063ec7c904537216a7193
       size: 251
+  report:
+    cmd: python -m obf.report
+    deps:
+    - path: obf/report.py
+      hash: md5
+      md5: b1733659d2503b64e9b2d83559f05d05
+      size: 2583
+    - path: results
+      hash: md5
+      md5: e362439f8eb0eb76a7ffbae174621bb1.dir
+      size: 541294875
+      nfiles: 124
+    outs:
+    - path: docs/REPORT.md
+      hash: md5
+      md5: b2dcb2c71148764d8ccba5987f2bcdde
+      size: 1939

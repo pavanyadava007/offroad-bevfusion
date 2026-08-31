@@ -18,6 +18,7 @@ target_include_directories(obf_trt PUBLIC ${OBF_CPP}/include ${TENSORRT_INCLUDE}
 target_link_libraries(obf_trt PUBLIC ${TENSORRT_LIB} ${TENSORRT_PLUGIN_LIB} CUDA::cudart)
 add_executable(obf_node src/obf_node.cpp)
 target_link_libraries(obf_node obf_trt)
+set_target_properties(obf_node PROPERTIES INSTALL_RPATH "\$ORIGIN")  # obf_trt installs beside the binary
 ament_target_dependencies(obf_node rclcpp vision_msgs nav_msgs sensor_msgs visualization_msgs geometry_msgs)
 install(TARGETS obf_node obf_trt DESTINATION lib/${PROJECT_NAME})
 install(PROGRAMS scripts/replay_sensors.py DESTINATION lib/${PROJECT_NAME})
