@@ -21,7 +21,9 @@ size_t dtype_size(nvinfer1::DataType t);
 
 class TrtRunner {
  public:
-  explicit TrtRunner(const std::string& engine_path);
+  explicit TrtRunner(const std::string& engine_path) : TrtRunner(engine_path, 0) {}
+  // stream_priority: CUDA stream priority (lower = higher priority, see cudaDeviceGetStreamPriorityRange); 0 = default.
+  TrtRunner(const std::string& engine_path, int stream_priority);
   ~TrtRunner();
   TrtRunner(const TrtRunner&) = delete;
   TrtRunner& operator=(const TrtRunner&) = delete;
@@ -31,6 +33,8 @@ class TrtRunner {
   void set_input(const std::string& name, const void* host);  // H2D copy
   void get_output(const std::string& name, void* host) const;  // D2H copy
   float infer();  // returns GPU time in ms
+  void enqueue();  // enqueueV3 on stream() without synchronising (caller copies/syncs)
+  cudaStream_t stream() const { return stream_; }
 
  private:
   class Logger : public nvinfer1::ILogger {

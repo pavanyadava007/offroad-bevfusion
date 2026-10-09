@@ -26,7 +26,7 @@ size_t dtype_size(nvinfer1::DataType t) {
   }
 }
 
-TrtRunner::TrtRunner(const std::string& path) {
+TrtRunner::TrtRunner(const std::string& path, int stream_priority) {
   std::ifstream f(path, std::ios::binary);
   if (!f) throw std::runtime_error("cannot open engine " + path);
   std::vector<char> blob((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
@@ -35,7 +35,7 @@ TrtRunner::TrtRunner(const std::string& path) {
   engine_.reset(runtime_->deserializeCudaEngine(blob.data(), blob.size()));
   if (!engine_) throw std::runtime_error("engine deserialization failed");
   ctx_.reset(engine_->createExecutionContext());
-  CK(cudaStreamCreate(&stream_));
+  CK(cudaStreamCreateWithPriority(&stream_, cudaStreamDefault, stream_priority));
   CK(cudaEventCreate(&t0_)); CK(cudaEventCreate(&t1_));
   for (int i = 0; i < engine_->getNbIOTensors(); ++i) {
     TensorInfo t;
@@ -70,6 +70,10 @@ void TrtRunner::set_input(const std::string& name, const void* host) {
 void TrtRunner::get_output(const std::string& name, void* host) const {
   const auto& t = tensor(name);
   CK(cudaMemcpy(host, t.dev, t.bytes, cudaMemcpyDeviceToHost));
+}
+
+void TrtRunner::enqueue() {
+  if (!ctx_->enqueueV3(stream_)) throw std::runtime_error("enqueueV3 failed");
 }
 
 float TrtRunner::infer() {

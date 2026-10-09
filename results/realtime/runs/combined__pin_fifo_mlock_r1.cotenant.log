@@ -1,0 +1,1 @@
+n=2756 rate=0.0Hz e2e p50=34.303 p99=79.019 p99.9=90.103 max=193.593 ms | wake-late sd=0.0 us max=0.0 us | misses=0 skipped=0 | cpu=87.8% nivcsw=2886

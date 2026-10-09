@@ -1,0 +1,10 @@
+{
+ "kernel": "6.1.158-178.288.amzn2023.x86_64",
+ "preempt": "PREEMPT_DYNAMIC kernel, active mode (none) voluntary full",
+ "preempt_rt": "absent",
+ "cpu": "AMD EPYC 7R13 Processor",
+ "gpu_driver": "NVIDIA L4, 580.95.05",
+ "tensorrt_lib": [
+  "libnvinfer.so.10"
+ ]
+}

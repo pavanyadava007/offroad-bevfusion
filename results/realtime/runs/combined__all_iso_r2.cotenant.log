@@ -1,0 +1,3 @@
+[TRT] The current device only supports 14 multiprocessors but the engine file requires 58. Deadlocking is likely.
+[TRT] Using an engine plan file across different models of devices is not supported and is likely to affect performance or even cause errors or deadlock.
+n=1098 rate=0.0Hz e2e p50=64.844 p99=94.131 p99.9=126.854 max=455.940 ms | wake-late sd=0.0 us max=0.0 us | misses=0 skipped=0 | cpu=89.0% nivcsw=2942

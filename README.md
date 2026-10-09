@@ -45,7 +45,41 @@ flowchart LR
 | nuScenes-mini training / ablation numbers | done on a local NVIDIA L4 (12 ep each): cam 0.022/0.059 → cam+L 0.047/0.099 → cam+L+R 0.053/0.108 (mAP/NDS), seg mIoU 0.302, occ mIoU 0.086; radar-dropout and mined-finetune rows in `docs/REPORT.md` (rain/night subsets are empty on mini_val → “—”) |
 | TensorRT engines + latency table | built + measured on a local NVIDIA L4 (`results/latency_l4.md`; `scripts/colab_trt.sh` remains for T4 — relabel the output if used) |
 | GOOSE transfer | done (goose_2d/3d_val.zip, 8 scenes 6/2 split): zero-shot drivable IoU 0.021 → fine-tuned 0.348; LiDAR-only — the 2D/3D zips ship no calibration, `goose_calib.py` writes identity and the camera branch self-disables |
+| Real-time latency / jitter under interference | done - C++ periodic benchmark (`cpp/bench`) at 30 Hz, 21 configs x 3 repeats x 2000 iterations on the L4 VM; report `results/REALTIME.md` |
 | rviz2 GIF | done — `docs/rviz_replay.gif` recorded in the `ros:humble` container (Xvfb + ffmpeg; obf_node at 11.5 ms/frame on the L4 FP16 engine) |
+
+## Real-time latency and jitter under interference
+
+`cpp/bench/latency_bench` runs the FP16 TensorRT engine in a fixed 30 Hz loop (absolute-deadline `clock_nanosleep`,
+deadline = 33.3 ms) end to end: host staging copy of the 24.2 MB input frame, H2D, `enqueueV3`, D2H of all 49.8 MB of
+outputs. It logs per-iteration latency, wake-up jitter and deadline misses plus CPU time, context switches, RSS and
+NVML GPU utilisation/memory, under CPU, memory-bandwidth and GPU co-tenant interference, with and without mitigations.
+Each row: 3 repeats x 2000 iterations (warm-up excluded), percentiles pooled over the 6000 samples; e2e latency in ms.
+
+| scenario | p50 | p99 | p99.9 | max | jitter sd (us) | misses / 6000 |
+|---|---|---|---|---|---|---|
+| idle | 19.54 | 19.92 | 20.13 | 20.71 | 9.1 | 0 |
+| CPU hogs (32 threads), no mitigation | 19.42 | 46.65 | 52.86 | 78.25 | 2525.3 | 2229 |
+| CPU hogs, taskset pinning only | 19.44 | 99.97 | 159.52 | 200.04 | 6943.3 | 1345 |
+| CPU hogs, `chrt -f 80` (SCHED_FIFO) | 19.25 | 19.47 | 19.68 | 19.79 | 2.8 | 0 |
+| CPU hogs, pinning + cgroup cpuset isolation | 19.65 | 19.79 | 19.84 | 20.03 | 5.0 | 0 |
+| memory-bandwidth hogs, no mitigation | 28.34 | 44.64 | 56.25 | 61.47 | 818.9 | 2124 |
+| memory-bandwidth hogs, pin + FIFO | 26.78 | 28.73 | 30.44 | 31.93 | 36.4 | 0 |
+| GPU co-tenant (2nd TensorRT process), no mitigation | 33.08 | 43.01 | 60.00 | 70.47 | 1555.8 | 2795 |
+| GPU co-tenant limited to 25 % SMs via MPS | 23.36 | 27.25 | 27.43 | 30.23 | 126.3 | 0 |
+| in-process GPU hog, same stream priority | 82.27 | 84.52 | 85.22 | 88.18 | 86.3 | 6000 |
+| in-process GPU hog, inference on high-priority stream | 29.57 | 30.55 | 30.83 | 31.14 | 5.8 | 0 |
+| combined (CPU + membw + GPU co-tenant), no mitigation | 41.34 | 84.56 | 104.75 | 130.28 | 4190.0 | 5176 |
+| combined, pin + FIFO + mlockall + MPS 25 % | 27.97 | 32.69 | 34.36 | 36.04 | 35.2 | 27 |
+
+What helped: SCHED_FIFO (CPU contention tail gone), cgroup cpuset isolation, MPS SM limits or rate-limiting the GPU
+co-tenant, and CUDA stream priority against a co-tenant **in the same process**. What did not: taskset pinning alone
+made the tail worse (+114 % p99, background daemons were pushed onto the reserved core), stream priority against a
+co-tenant in **another process** (no effect, -0.2 % p99), and nothing on the CPU side removes the memory-bandwidth
+slowdown (p50 26.78 ms vs 19.54 ms idle). Under combined load the best config still misses 27 / 6000 deadlines.
+Full tables (stage split, resources, co-tenant cost, all 21 configs, verdict rule): [results/REALTIME.md](results/REALTIME.md).
+**Measured on an AWS EC2 NVIDIA L4 VM (AMD EPYC 7R13, kernel 6.1 PREEMPT_DYNAMIC): not an industrial edge device, not
+PREEMPT_RT, hypervisor noise present.**
 
 ## Quick start
 ```bash

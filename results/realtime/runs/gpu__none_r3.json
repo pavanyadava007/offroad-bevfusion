@@ -1,0 +1,13 @@
+{
+  "meta": {"config": "gpu__none", "interference": "gpu", "mitigation": "none", "repeat": "3", "mps": "0", "pinned": "0"},
+  "host": {"kernel": "6.1.158-178.288.amzn2023.x86_64", "kernel_version": "#1 SMP PREEMPT_DYNAMIC Mon Nov  3 18:38:36 UTC 2025", "gpu": "NVIDIA L4", "nproc": 32},
+  "config": {"engine": "results/export/bevfusion_fp16.engine", "rate_hz": 30, "deadline_ms": 33.3333, "iters": 2000, "warmup": 100, "input_bytes": 24226400, "output_bytes": 49760000, "affinity": "inherited", "fifo": "off", "mlock": "off", "timerslack_ns": "50000", "stream_priority": 0, "stream_priority_range": [0, -5], "blocking_sync": false, "inproc_hog_blocks": 0, "inproc_hog_prio": "least", "inproc_hog_launches": 0},
+  "e2e_ms": {"n": 2000, "mean": 34.1833, "sd": 4.7256, "min": 19.5392, "p50": 33.2321, "p95": 41.6887, "p99": 49.9988, "p999": 66.5677, "max": 70.4672},
+  "response_ms": {"n": 2000, "mean": 34.7009, "sd": 5.8479, "min": 19.6006, "p50": 33.3310, "p95": 43.0865, "p99": 59.4052, "p999": 73.2995, "max": 86.6376},
+  "wake_late_us": {"n": 2000, "mean": 517.5371, "sd": 2670.8823, "min": 12.6020, "p50": 72.9945, "p95": 93.4069, "p99": 14306.1197, "p999": 26639.8721, "max": 39953.2310},
+  "stages_ms": {"pre": {"n": 2000, "mean": 2.1461, "sd": 0.8291, "min": 1.5278, "p50": 2.1541, "p95": 2.3068, "p99": 2.5806, "p999": 17.9736, "max": 21.8016}, "h2d": {"n": 2000, "mean": 1.9287, "sd": 0.2239, "min": 1.8252, "p50": 1.8798, "p95": 1.9940, "p99": 3.2097, "p999": 3.6345, "max": 3.7252}, "infer": {"n": 2000, "mean": 24.8375, "sd": 3.0783, "min": 11.9986, "p50": 24.9021, "p95": 29.7416, "p99": 31.1545, "p999": 31.9724, "max": 43.3104}, "d2h": {"n": 2000, "mean": 4.4344, "sd": 0.9270, "min": 3.7746, "p50": 3.9627, "p95": 6.7676, "p99": 7.2150, "p999": 7.4044, "max": 7.4233}},
+  "deadline_misses": 1000,
+  "skipped_releases": 1011,
+  "resources": {"wall_s": 100.3667, "cpu_user_s": 62.8971, "cpu_sys_s": 0.2777, "cpu_pct_of_one_core": 62.9441, "proc_vol_csw": 5008, "proc_invol_csw": 645, "loop_thread_vol_csw": 2001, "loop_thread_invol_csw": 643, "maxrss_mb": 596.9609, "rss_end_mb": 597.9648, "nvml_ok": true, "nvml_samples": 2087, "gpu_util_mean_pct": 95.9401, "gpu_util_max_pct": 100.0000, "gpu_mem_util_mean_pct": 43.6090, "gpu_dev_mem_used_max_mb": 1800.0000, "gpu_proc_mem_max_mb": 658.0000},
+  "checksum": -6857.8125
+}
